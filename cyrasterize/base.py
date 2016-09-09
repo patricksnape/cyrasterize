@@ -22,7 +22,8 @@ class CyUniformBase(object):
         uniforms = opengl.get_active_uniforms()
 
         for name in uniforms:
-            fset = lambda self, value, name: self._opengl.set_uniform(name, value)
+            fset = lambda self, value, name: self._opengl.set_uniform(name,
+                                                                      value)
             fget = lambda self, name: self._opengl.get_uniform(name)
 
             doc = '''
@@ -48,7 +49,6 @@ class CyRasterizerBase(object):
 
     Parameters
     ----------
-
     width : `int`
         The width of the rasterize target
     height : `int`
@@ -60,9 +60,9 @@ class CyRasterizerBase(object):
     Notes
     -----
     For a given vertex v = (x, y, z, 1), it's position in image space
-    v' = (s, t) is calculated from
+    v' = (s, t) is calculated from::
 
-    v' = P * V * M * v
+        v' = P * V * M * v
 
     where:
 
@@ -91,7 +91,6 @@ class CyRasterizerBase(object):
     Note that because of the above statement, the shape information
     rendered would be in the objects original space, not in camera space
     (i.e. the z value will not correlate to a depth buffer).
-
     """
 
     def __init__(self, width=1024, height=768, model_matrix=None,
@@ -130,7 +129,8 @@ class CyRasterizerBase(object):
     def projection_matrix(self):
         return self._opengl.get_projection_matrix()
 
-    def set_shaders(self, geometry=None, vertex=None, fragment=None, use_last_uniforms=True):
+    def set_shaders(self, geometry=None, vertex=None, fragment=None,
+                    use_last_uniforms=True):
 
         self._opengl.attach_shaders(
             [c(x) for x, c in
@@ -235,7 +235,6 @@ class CyRasterizerBase(object):
         interp = np.require(per_vertex_f3v, dtype=np.float32, requirements='c')
 
         if normals is not None:
-            # Custom normals - use the special function call that allows us to customize
             rgb_fb, f3v_fb = self._opengl.render_offscreen_rgb_custom_vertex_normals(
                 points, normals, interp, trilist, tcoords, texture)
         else:

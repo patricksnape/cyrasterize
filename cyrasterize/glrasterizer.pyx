@@ -104,6 +104,7 @@ cdef class GLUniform:
     def get_value(self):
         return self.value
 
+
 def normalize_v3(arr):
     """ Normalize a numpy array of 3 component vectors shape=(n,3)"""
     lens = np.sqrt( arr[:,0]**2 + arr[:,1]**2 + arr[:,2]**2 )
@@ -142,6 +143,7 @@ def vertex_normals(points, trilist):
     normalize_v3(norm)
 
     return norm
+
 
 cdef class GLScene:
     cdef GLuint program
@@ -256,14 +258,12 @@ cdef class GLScene:
 
         self.uniforms[name] = uniform
 
-
     cdef void init_frame_buffer(self):
         self.fb_rgb_target.unit = 0
         self.fb_f3v_target.unit = 0
 
         glr_init_texture(&self.fb_rgb_target)
         glr_init_texture(&self.fb_f3v_target)
-
 
         glGenFramebuffers(1, &self.fbo)
 

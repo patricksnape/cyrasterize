@@ -100,8 +100,6 @@ cdef extern from "./cpp/glr.h":
     void glr_get_framebuffer(glr_texture* texture)
     void glr_destroy_vbos_on_trianglar_mesh(glr_textured_mesh* mesh)
 
-
-
     glr_scene glr_build_scene()
 
     # utilities

@@ -8,6 +8,6 @@ layout(location = 0) out vec3 outputColor;
 
 void main()
 {
-   outputColor = interpColor*interpColor*texture(texture_image, tcoord).rgb;
+    outputColor = interpColor*interpColor*texture(texture_image, tcoord).rgb;
 }
 

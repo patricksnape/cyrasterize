@@ -215,13 +215,13 @@ void glr_init_texture(glr_texture *texture) {
     // behavior around different texture sets, I'd have to keep flicking all this
     // state on and off around the correct rendering calls.
     //
-    // d. If I was writing a game, this could be a challanging task. I may have
+    // d. If I was writing a game, this could be a challenging task. I may have
     // many different types of textures on the go, and I'd have to manage all this
     // state. To make things a little easier, TEXTURE UNITS were introduced. A
     // TEXTURE UNIT just holds a set of currently bound textures - so, on a unit,
     // you can leave your texture id bound to GL_TEXTURE_2D for instance. All
     // sampling calls are also bound to a unit - so making a unit active sets
-    // up all the sampler state as it last was when the unit was actice.
+    // up all the sampler state as it last was when the unit was active.
     //
     // Now the usage pattern is something like:
     //
@@ -229,7 +229,7 @@ void glr_init_texture(glr_texture *texture) {
     //   GL_TEXTURE_2D texture, my mipmap and normal textures...everything. Also
     //   set all my sampler state for these family of textures.
     //
-    //   - unblind the texture unit, and know all my binds won't be disturbed.
+    //   - unbind the texture unit, and know all my binds won't be disturbed.
     //     Do whatever else we need to with textures (binding to GL_TEXTURE_2D,
     //     changing sampler state - not of it will affect the texture unit you
     //     have).
@@ -241,8 +241,6 @@ void glr_init_texture(glr_texture *texture) {
     // In order then, the first thing to do is choose our texture unit
     //
     // 1. Set the unit to texture->unit
-
-
 	glActiveTexture(GL_TEXTURE0 + texture->unit);
 
 
@@ -252,16 +250,6 @@ void glr_init_texture(glr_texture *texture) {
 
     // 3. Set the currently active GL_TEXTURE_2D to the texture->id
 	glBindTexture(GL_TEXTURE_2D, texture->id);
-
-    // oid glTexImage2D(	GLenum target,
-    // 	GLint level,
-    // 	GLint internalFormat,
-    // 	GLsizei width,
-    // 	GLsizei height,
-    // 	GLint border,
-    // 	GLenum format,
-    // 	GLenum type,
-    // 	const GLvoid * data);
 
     // 4. fill the currently active GL_TEXTURE_2D (texture->id thanks to 3.)
     // with our actual pixels
@@ -276,7 +264,6 @@ void glr_init_texture(glr_texture *texture) {
 	glSamplerParameteri(texture->sampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glSamplerParameteri(texture->sampler, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glSamplerParameteri(texture->sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-
 
     // Bind this metadata to the unit
 	glBindSampler(texture->unit, texture->sampler);
