@@ -1,4 +1,5 @@
 from libcpp cimport bool
+from libc.stdlib cimport malloc, free
 from .c_opengl cimport *
 from .c_opengl_debug cimport *
 import logging as log

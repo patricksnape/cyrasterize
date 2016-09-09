@@ -2,6 +2,15 @@ from libc.stdint cimport uint8_t
 from libcpp cimport bool
 from c_opengl cimport *
 
+
+cdef extern from "GLFW/glfw3.h":
+    ctypedef struct GLFWwindow:
+        pass
+    void glfwSwapBuffers(GLFWwindow *window) nogil
+    void glfwPollEvents() nogil
+    void glfwMakeContextCurrent(GLFWwindow *window) nogil
+
+
 # we need to be able to hold onto a context reference
 cdef extern from "./cpp/glrglfw.h":
     ctypedef struct glr_glfw_context:
@@ -9,7 +18,7 @@ cdef extern from "./cpp/glrglfw.h":
         int window_height
         const char*title
         bool offscreen
-        void* window
+        GLFWwindow* window
 
     ctypedef enum glr_STATUS:
         GLR_SUCCESS
@@ -107,24 +116,6 @@ cdef extern from "./cpp/glr.h":
     void glr_get_clear_color(float* clear_colour_4_vec)
     void glr_check_error()
 
-
-cdef extern from "GLFW/glfw3.h":
-    ctypedef struct GLFWwindow:
-        pass
-    void glfwSwapBuffers(GLFWwindow *window) nogil
-    void glfwPollEvents() nogil
-
-cdef extern from "stdlib.h":
-    ctypedef unsigned long size_t
-    void free(void *ptr) nogil
-    void *realloc(void *ptr, size_t size) nogil
-    void *malloc(size_t size) nogil
-    void *calloc(size_t nmemb, size_t size) nogil
-
-
-cdef extern from "string.h":
-    void *memcpy(void *dest, void *src, size_t n) nogil
-    void *memset(void *dest, int c, size_t len)
 
 cdef extern from *:
     ctypedef char* const_char_ptr "const char*"

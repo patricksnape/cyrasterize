@@ -5,6 +5,7 @@ import os.path
 import sys
 import numpy as np
 
+from functools import wraps
 from .c_opengl cimport *
 from .c_opengl_debug cimport *
 from .shader import VertexShader, FragmentShader
@@ -16,6 +17,14 @@ DEFAULT_VERTEX_SHADER_SRC = open(SHADER_BASEPATH + '.vert', 'rt').read()
 DEFAULT_FRAGMENT_SHADER_SRC = open(SHADER_BASEPATH + '.frag', 'rt').read()
 
 ctypedef void (*matrix_fun)(GLint, GLsizei, GLboolean, GLfloat *)
+
+
+def set_context_current(f):
+    @wraps(f)
+    def wrapper(GLScene self, *args, **kwargs):
+        glfwMakeContextCurrent(self.context.window)
+        return f(self, *args, **kwargs)
+    return wrapper
 
 
 cdef class GLUniform:
@@ -201,13 +210,14 @@ cdef class GLScene:
 
         self.init_frame_buffer()
 
+    @set_context_current
     def attach_shaders(self, shaders):
         for shader in shaders:
             self.attach_shader(shader)
 
         glLinkProgram(self.program)
 
-
+    @set_context_current
     def attach_shader(self, shader):
         """
         Attaches a shader to the engine.
@@ -232,16 +242,18 @@ cdef class GLScene:
         if not self.is_linked():
             self.uniforms = dict()
 
-    cpdef get_uniform(self, name):
+    @set_context_current
+    def get_uniform(self, name):
         try:
             return self.uniforms[name].get_value()
         except KeyError:
             return None
 
-    cpdef set_uniform(self, name, value):
+    @set_context_current
+    def set_uniform(self, name, value):
         value = np.asarray(value)
 
-        cdef bytes c_name = name.encode('UTF-8')
+        cdef bytes c_name = name.encode('utf-8')
 
         location = glGetUniformLocation(self.program, c_name)
 
@@ -322,6 +334,7 @@ cdef class GLScene:
         cdef bytes ret = msg[:length]
         return ret.split(b'\0')[0].decode('utf-8')
 
+    @set_context_current
     def render_scene(self):
         glUseProgram(self.program)
 
@@ -371,7 +384,7 @@ cdef class GLScene:
         glr_destroy_vbos_on_trianglar_mesh(&self.mesh)
         glDeleteTextures(1, &self.mesh.texture.id)
 
-
+    @set_context_current
     def get_active_uniforms(self):
         cdef int total = -1;
         glGetProgramiv(self.program, GL_ACTIVE_UNIFORMS, &total)
@@ -394,6 +407,7 @@ cdef class GLScene:
 
         return uniforms
 
+    @set_context_current
     def render_offscreen_rgb(self,
             np.ndarray[float, ndim=2, mode="c"] points not None,
             np.ndarray[float, ndim=2, mode="c"] f3v_data not None,
@@ -409,6 +423,7 @@ cdef class GLScene:
 
     # A more flexible version of render_offscreen_rgb where custom
     # per-vertex normals can be provided.
+    @set_context_current
     def render_offscreen_rgb_custom_vertex_normals(self,
             np.ndarray[float, ndim=2, mode="c"] points not None,
             np.ndarray[float, ndim=2, mode="c"] normals not None,
@@ -429,12 +444,14 @@ cdef class GLScene:
 
         return np.array(self.rgb_pixels), np.array(self.f3v_pixels)
 
-    cpdef set_clear_color(self, np.ndarray[float, ndim=1, mode='c'] clear_c):
+    @set_context_current
+    def set_clear_color(self, np.ndarray[float, ndim=1, mode='c'] clear_c):
         if clear_c.size != 4:
             raise ValueError("colour vector must be 4 elements long")
         glr_set_clear_color(&clear_c[0])
 
-    cpdef get_clear_color(self):
+    @set_context_current
+    def get_clear_color(self):
         cdef np.ndarray[float, ndim=1, mode='c'] clear_color
         clear_color = np.empty(4, dtype=np.float32)
         glr_get_clear_color(&clear_color[0])
@@ -452,6 +469,7 @@ cdef class GLScene:
     def successfully_initialized(self):
         return self.success
 
+    @set_context_current
     def reset_view(self):
         orthogonal = np.require(np.eye(4), dtype=np.float32, requirements='C')
 
@@ -471,15 +489,19 @@ cdef class GLRasterizer(GLScene):
         # Initialise camera/projection matrices
         self.reset_view()
 
-    cpdef get_model_matrix(self):
+    @set_context_current
+    def get_model_matrix(self):
         return self.get_uniform('modelMatrix')
 
-    cpdef get_view_matrix(self):
+    @set_context_current
+    def get_view_matrix(self):
         return self.get_uniform('viewMatrix')
 
-    cpdef get_projection_matrix(self):
+    @set_context_current
+    def get_projection_matrix(self):
         return self.get_uniform('projectionMatrix')
 
+    @set_context_current
     def get_compound_matrix(self):
         M = self.get_model_matrix()
         V = self.get_view_matrix()
@@ -487,16 +509,19 @@ cdef class GLRasterizer(GLScene):
 
         return P.dot(V).dot(M)
 
-    cpdef set_model_matrix(self,
+    @set_context_current
+    def set_model_matrix(self,
                            np.ndarray[float, ndim=2, mode="c"] m):
         self.set_uniform('modelMatrix', m)
 
-    cpdef set_view_matrix(self,
+    @set_context_current
+    def set_view_matrix(self,
                           np.ndarray[float, ndim=2, mode="c"] m):
 
         self.set_uniform('viewMatrix', m)
 
-    cpdef set_projection_matrix(self,
+    @set_context_current
+    def set_projection_matrix(self,
                     np.ndarray[float, ndim=2, mode="c"] m):
 
         return self.set_uniform('projectionMatrix', m)
