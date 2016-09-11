@@ -22,4 +22,5 @@ glr_glfw_context glr_build_glfw_context_offscreen(int width, int height);
 glr_STATUS glr_glfw_init(glr_glfw_context* context, int verbose);
 
 void glr_glfw_terminate(glr_glfw_context* context);
+void glr_glfw_stop();
 void glfw_error_callback(int error, const char* description);

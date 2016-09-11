@@ -30,6 +30,7 @@ cdef extern from "./cpp/glrglfw.h":
                                                            int height)
     cdef glr_STATUS glr_glfw_init(glr_glfw_context* context, int verbose)
     cdef void glr_glfw_terminate(glr_glfw_context* context)
+    cdef void glr_glfw_stop()
 
 
 # we need to be able to hold onto a scene reference

@@ -98,6 +98,14 @@ void glr_glfw_terminate(glr_glfw_context* context)
 {
     // Ensure we have unset all callbacks and then terminate
     glfwSetErrorCallback(NULL);
+//    glfwTerminate();
+}
+
+
+void glr_glfw_stop()
+{
+    // Ensure we have unset all callbacks and then terminate
+    glfwSetErrorCallback(NULL);
     glfwTerminate();
 }
 

@@ -475,7 +475,14 @@ cdef class GLScene:
 
         self.set_model_matrix(orthogonal)
         self.set_view_matrix(orthogonal)
-        self.set_projection_matrix(orthogonal)
+        # Note the flip in the z axis via the homogeneous coordinate!!
+        # This is because OpenGL by default evaluates depth as bigger number ==
+        # further away. Thus not only do we need to get to clip space [-1, 1] in
+        # all dims) but we must invert the z axis so depth buffering is correctly
+        # applied.
+        proj_orthogonal = orthogonal.copy()
+        proj_orthogonal[-2, 2] = -1
+        self.set_projection_matrix(proj_orthogonal)
 
 
 cdef class GLRasterizer(GLScene):
@@ -488,6 +495,10 @@ cdef class GLRasterizer(GLScene):
 
         # Initialise camera/projection matrices
         self.reset_view()
+
+    @set_context_current
+    def stop(self):
+        glr_glfw_stop()
 
     @set_context_current
     def get_model_matrix(self):

@@ -7,7 +7,7 @@ uniform mat4 viewMatrix;
 smooth in vec2 tcoord;
 smooth in vec3 linearMappingCoord;
 smooth in vec3 normalInterp;
-smooth in vec3 FragPos;
+smooth in vec3 fragPos;
 
 uniform vec3 lightPos;
 
@@ -20,13 +20,13 @@ void main() {
    vec3 color = texture(textureImage, tcoord).rgb;
    vec3 ambient = 0.05 * color;
 
-   vec3 lightDir = normalize(lightPos - FragPos);
+   vec3 lightDir = normalize(lightPos - fragPos);
 
    vec3 normal = normalize(normalInterp);
    float lambertian = max(dot(lightDir, normal), 0.0);
    vec3 diffuse = lambertian * color;
 
-   vec3 viewDir = normalize(-FragPos);
+   vec3 viewDir = normalize(-fragPos);
 
    vec3 halfwayDir = normalize(lightDir + viewDir);
 
